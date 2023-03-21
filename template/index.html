@@ -1,19 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TensorFlow.js Tutorial</title>
+	<title>Handwritten Digit Recognition</title>
+	<style type="text/css">
+		#canvas {
+			border: 2px solid black;
+		}
+	</style>
+	<script type="text/javascript">
+		var canvas, ctx;
+		var mouseX, mouseY;
+		var isMouseDown = false;
 
-  <!-- Import TensorFlow.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
-  <!-- Import tfjs-vis -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
+		function init() {
+			canvas = document.getElementById('canvas');
+			ctx = canvas.getContext('2d');
 
+			canvas.addEventListener('mousedown', function(event) {
+				isMouseDown = true;
+				mouseX = event.offsetX;
+				mouseY = event.offsetY;
+				ctx.beginPath();
+				ctx.moveTo(mouseX, mouseY);
+			});
 
+			canvas.addEventListener('mousemove', function(event) {
+				if (isMouseDown) {
+					mouseX = event.offsetX;
+					mouseY = event.offsetY;
+					ctx.lineTo(mouseX, mouseY);
+					ctx.stroke();
+				}
+			});
+
+			canvas.addEventListener('mouseup', function(event) {
+				isMouseDown = false;
+			});
+
+			canvas.addEventListener('mouseleave', function(event) {
+				isMouseDown = false;
+			});
+
+			document.getElementById('predict-button').addEventListener('click', function(event) {
+				var imageData = canvas.toDataURL();
+				imageData = imageData.replace(/^data:image\/(png|jpg);base64,/, "");
+				document.getElementById('image-data').value = imageData;
+				document.getElementById('prediction-form').submit();
+			});
+		}
+	</script>
 </head>
-
-<body>
+<body onload="init()">
+	<h1>Handwritten Digit Recognition</h1>
+	<canvas id="canvas" width="200" height="200"></canvas>
+	<br>
+	<button id="predict-button">Predict Digit</button>
+	<form id="prediction-form" method="POST" action="/predict">
+		<input type="hidden" id="image-data" name="imageData">
+	</form>
 </body>
 </html>
